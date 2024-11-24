@@ -20,7 +20,7 @@ def ler_dados_tab_func(nome_arquivo):
 identificadores, horarios, quantidades_minimas_empregados, multiplicadores_salario = ler_dados_tab_func('Tab_Func.txt')
 
 # Imprimir os dados lidos
-print ("Dados lidos do arquivo Tab_Func.txt:")
+print("Dados lidos do arquivo Tab_Func.txt:")
 for identificador, horario, quantidade_minima_empregado, multiplicador_salario in zip(identificadores, horarios, quantidades_minimas_empregados, multiplicadores_salario):
     print(f"Período: {identificador}, Horário: {horario}, Quantidade Minima de Empregados: {quantidade_minima_empregado}, Salário: {multiplicador_salario}")
 
