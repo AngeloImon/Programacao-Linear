@@ -64,7 +64,7 @@ print(f'Obj: {modelo.objVal}')
 # Lista de arquivos de instâncias
 arquivos_instancias = ['inst_4a.txt', 'inst_4b.txt', 'inst_5a.txt', 'inst_5b.txt', 'inst_6a.txt', 'inst_6b.txt']
 
-# Função para ler dados de instâncias
+# Função para ler dados de instâncias IGNORANDO A PRIMEIRA LINHA
 def ler_dados_instancia(nome_arquivo):
     with open(nome_arquivo, 'r') as arquivo:
         linhas = arquivo.readlines()
@@ -82,14 +82,19 @@ for arquivo_instancia in arquivos_instancias:
 
     # Repetir as quantidades mínimas de empregados para cada identificador
     quantidades_minimas_empregados = []
-    for identificador in identificadores:
-        index = identificadores.index(identificador)
-        quantidades_minimas_empregados.append(quantidades_minimas_empregados_instancia[index % len(quantidades_minimas_empregados_instancia)])
+    for i in range(len(identificadores)):
+        periodo = identificadores[i]
+        quantidades_minimas_empregados.append(quantidades_minimas_empregados_instancia[periodo - 1])
     
     # Atualizar as restrições com os novos dados
     for i in range(len(identificadores)):
         modelo.getConstrByName(f"R[{i}]").RHS = quantidades_minimas_empregados[i]
     
+    # Imprimir os dados lidos
+    print(f"Dados atualizados {arquivo_instancia}:") 
+    for identificador, horario, quantidade_minima_empregado, multiplicador_salario in zip(identificadores, horarios, quantidades_minimas_empregados, multiplicadores_salario):
+        print(f"Período: {identificador}, Horário: {horario}, Quantidade Minima de Empregados: {quantidade_minima_empregado}, Salário: {multiplicador_salario}")
+
     # Resolver o modelo novamente
     modelo.optimize()
     
