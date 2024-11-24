@@ -52,7 +52,7 @@ modelo.optimize()
 print('Solução base:')
 for i in range(len(identificadores)):
     if x[i].x > 0:
-        print(f'Horário de entrada: {horarios[i]}:00 - Quantidade Empregados: {x[i].x:.0f}')
+        print(f'Horário de entrada: {horarios[i]}:00 - Quantidade Empregados: {x[i].x:2.0f} - Quantidade total empregados: {Q[i].x:.0f}')
 
 print(f'Obj: {modelo.objVal}')
 
@@ -85,9 +85,17 @@ for arquivo_instancia in arquivos_instancias:
         periodo = identificadores[i]
         quantidades_minimas_empregados.append(quantidades_minimas_empregados_instancia[periodo - 1])
     
-    # Atualizar as restrições com os novos dados
-    for i in range(len(identificadores)):
-        modelo.getConstrByName(f"R[{i}]").RHS = quantidades_minimas_empregados[i]
+    # Remover as restrições antigas
+    modelo.remove(modelo.getConstrs())
+
+    # Adicionar novas restrições com os vetores atualizados
+    modelo.addConstrs(
+        (gp.quicksum(x[j%24] for j in range(i-5, i+1)) == Q[i] for i in range(len(identificadores))), name="R"
+    )
+
+    modelo.addConstrs(
+        (Q[i] >= quantidades_minimas_empregados[i] for i in range(len(identificadores))), name="R"
+    )
     
     # Imprimir os dados lidos
     print(f"Dados atualizados {arquivo_instancia}:") 
@@ -101,5 +109,5 @@ for arquivo_instancia in arquivos_instancias:
     print(f'Solução para {arquivo_instancia}:')
     for i in range(len(identificadores)):
         if x[i].x > 0:
-            print(f'Horário de entrada: {horarios[i]}:00 - Quantidade Empregados: {x[i].x:.0f}')
+            print(f'Horário de entrada: {horarios[i]}:00 - Quantidade Empregados: {x[i].x:2.0f} - Quantidade total empregados: {Q[i].x:.0f}')
     print(f'Obj: {modelo.objVal}')
