@@ -1,5 +1,4 @@
 import gurobipy as gp
-import os
 
 # Função para ler dados do arquivo Tab_Func.txt
 def ler_dados_tab_func(nome_arquivo):
