@@ -1,53 +1,101 @@
 import gurobipy as gp
+import os
 
-# Function to read data from Tab_Func.txt
-def read_tab_func_data(filename):
-    tab_func_data = []
-    with open(filename, 'r') as file:
-        for line in file:
-            parts = line.strip().split()
-            identifier = int(parts[0])
-            hour_time = parts[1]
-            min_employee_amount = int(parts[2])
-            salary_multiplier = float(parts[3])
-            tab_func_data.append((identifier, hour_time, min_employee_amount, salary_multiplier))
-    return tab_func_data
+# Função para ler dados do arquivo Tab_Func.txt
+def ler_dados_tab_func(nome_arquivo):
+    identificadores = [] # Cria vetor de identificadores de horários
+    horarios = [] # Cria vetor de horários
+    quantidades_minimas_empregados = [] # Cria vetor de quantidades mínimas de empregados
+    multiplicadores_salario = [] # Cria vetor de multiplicadores de salário pela hora
+    with open(nome_arquivo, 'r') as arquivo: 
+        for linha in arquivo: # Loop para cada linha do arquivo
+            partes = linha.strip().split() # Dividir a linha em partes
+            identificadores.append(int(partes[0])) # Adicionar o identificador do horário
+            horarios.append(partes[1]) # Adicionar o horário
+            quantidades_minimas_empregados.append(int(partes[2])) # Adicionar a quantidade mínima de empregados
+            multiplicadores_salario.append(float(partes[3])) # Adicionar o multiplicador de salário
+    return identificadores, horarios, quantidades_minimas_empregados, multiplicadores_salario # Retornar os vetores
 
-# Read data from Tab_Func.txt
-tab_func_data = read_tab_func_data('Tab_Func.txt')
+# Ler dados do arquivo Tab_Func.txt
+identificadores, horarios, quantidades_minimas_empregados, multiplicadores_salario = ler_dados_tab_func('Tab_Func.txt')
 
-# Print the parsed data
-for identifier, hour_time, min_employee_amount, salary_multiplier in tab_func_data:
-    print(f"Período: {identifier}, Horário: {hour_time}, NMA: {min_employee_amount}, Salário: {salary_multiplier}")
+# Imprimir os dados lidos
+print ("Dados lidos do arquivo Tab_Func.txt:")
+for identificador, horario, quantidade_minima_empregado, multiplicador_salario in zip(identificadores, horarios, quantidades_minimas_empregados, multiplicadores_salario):
+    print(f"Período: {identificador}, Horário: {horario}, Quantidade Minima de Empregados: {quantidade_minima_empregado}, Salário: {multiplicador_salario}")
 
-# Creating an optimization model
+# Criando um modelo de otimização
 modelo = gp.Model()
 
-# Creating decision variables
-x = modelo.addVars(len(tab_func_data), name="x")  # Create variables for each hour
-Q = modelo.addVars(len(tab_func_data), name="x")  # Create variables for each hour
+# Criando variáveis de decisão
+x = modelo.addVars(len(identificadores), name="x")  # Criar variáveis para cada horário
+Q = modelo.addVars(len(identificadores), name="Q")  # Criar variáveis para cada horário
 
-# Objective function
-modelo.setObjective(gp.quicksum(Q[i]*tab_func_data[i][3] for i in range(len(tab_func_data))), sense=gp.GRB.MINIMIZE
+# Função objetivo
+modelo.setObjective(gp.quicksum(Q[i]*multiplicadores_salario[i] for i in range(len(identificadores))), sense=gp.GRB.MINIMIZE)
+
+# Restrições
+modelo.addConstrs(
+    (gp.quicksum(x[j%24] for j in range(i-5, i+1)) == Q[i] for i in range(len(identificadores))), name="R"
 )
 
-# Constraints
-R1 = modelo.addConstrs(
-    (gp.quicksum(x[j%24] for j in range(i-5, i+1)) == Q[i] for i in range(len(tab_func_data))), name="R"
+modelo.addConstrs(
+    (Q[i] >= quantidades_minimas_empregados[i] for i in range(len(identificadores))), name="R"
 )
 
-R1 = modelo.addConstrs(
-    (Q[i] >= tab_func_data[i][2] for i in range(len(tab_func_data))), name="R"
-)
-# Suppress terminal output
+# Suprimir saída no terminal
 modelo.setParam("OutputFlag", 0)
 
-# Solving the model
+# Resolver o modelo
 modelo.optimize()
 
-# Print the solution
-for i in range(len(tab_func_data)):
+# Imprimir a solução
+print('Solução base:')
+for i in range(len(identificadores)):
     if x[i].x > 0:
-        print(f'Horario de entrada: {tab_func_data[i][1]}:00 - Quantidade Empregados: {x[i].x:.0f}')
+        print(f'Horário de entrada: {horarios[i]}:00 - Quantidade Empregados: {x[i].x:.0f}')
 
 print(f'Obj: {modelo.objVal}')
+
+# Até aqui é onde já fizemos em sala, com o professor. Eu retirei da matriz que tinha criado antes, e coloquei os vetores para serem utilizados diretamente no código.
+# Essa parte de baixo, é o loop que tinha comentado que ia fazer, em sala, para cada arquivo diferente lido pelo algoritimo. 
+# Valeu, falous. Foi um porre conseguir fazer isso internado. Eu vou chorar.
+
+# Lista de arquivos de instâncias
+arquivos_instancias = ['inst_4a.txt', 'inst_4b.txt', 'inst_5a.txt', 'inst_5b.txt', 'inst_6a.txt', 'inst_6b.txt']
+
+# Função para ler dados de instâncias
+def ler_dados_instancia(nome_arquivo):
+    with open(nome_arquivo, 'r') as arquivo:
+        linhas = arquivo.readlines()
+        quantidades_minimas_empregados = [int(linha.strip()) for linha in linhas[1:]]
+    return quantidades_minimas_empregados
+
+# Loop para processar cada arquivo de instância
+for arquivo_instancia in arquivos_instancias:
+    quantidades_minimas_empregados_instancia = ler_dados_instancia(arquivo_instancia)
+    
+    # Verificar se o número de quantidades mínimas de empregados na instância corresponde ao número de identificadores únicos
+    if len(quantidades_minimas_empregados_instancia) != len(set(identificadores)):
+        print(f"Erro: O número de quantidades mínimas de empregados na instância {arquivo_instancia} não corresponde ao número de identificadores únicos.")
+        continue
+
+    # Repetir as quantidades mínimas de empregados para cada identificador
+    quantidades_minimas_empregados = []
+    for identificador in identificadores:
+        index = identificadores.index(identificador)
+        quantidades_minimas_empregados.append(quantidades_minimas_empregados_instancia[index % len(quantidades_minimas_empregados_instancia)])
+    
+    # Atualizar as restrições com os novos dados
+    for i in range(len(identificadores)):
+        modelo.getConstrByName(f"R[{i}]").RHS = quantidades_minimas_empregados[i]
+    
+    # Resolver o modelo novamente
+    modelo.optimize()
+    
+    # Imprimir a solução para a instância atual
+    print(f'Solução para {arquivo_instancia}:')
+    for i in range(len(identificadores)):
+        if x[i].x > 0:
+            print(f'Horário de entrada: {horarios[i]}:00 - Quantidade Empregados: {x[i].x:.0f}')
+    print(f'Obj: {modelo.objVal}')
