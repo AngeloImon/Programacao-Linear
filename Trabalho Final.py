@@ -27,8 +27,8 @@ for identificador, horario, quantidade_minima_empregado, multiplicador_salario i
 modelo = gp.Model()
 
 # Criando variáveis de decisão
-x = modelo.addVars(len(identificadores), name="x")  # Criar variáveis para cada horário
-Q = modelo.addVars(len(identificadores), name="Q")  # Criar variáveis para cada horário
+x = modelo.addVars(len(identificadores), name="x")  # Funcionários que entram na hora i
+Q = modelo.addVars(len(identificadores), name="Q")  # Quantidade total de funcionarios na hora i
 
 # Função objetivo
 modelo.setObjective(gp.quicksum(Q[i]*multiplicadores_salario[i] for i in range(len(identificadores))), sense=gp.GRB.MINIMIZE)
