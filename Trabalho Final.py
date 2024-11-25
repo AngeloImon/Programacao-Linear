@@ -35,11 +35,11 @@ modelo.setObjective(gp.quicksum(Q[i]*multiplicadores_salario[i] for i in range(l
 
 # Restrições
 modelo.addConstrs(
-    (gp.quicksum(x[j%24] for j in range(i-5, i+1)) == Q[i] for i in range(len(identificadores))), name="R"
+    (gp.quicksum(x[j%24] for j in range(i-5, i+1)) == Q[i] for i in range(len(identificadores))), name="Restrição de quantidade total de empregados"
 )
 
 modelo.addConstrs(
-    (Q[i] >= quantidades_minimas_empregados[i] for i in range(len(identificadores))), name="R"
+    (Q[i] >= quantidades_minimas_empregados[i] for i in range(len(identificadores))), name="Restrição de quantidade mínima de empregados"
 )
 
 # Suprimir saída no terminal
@@ -90,11 +90,11 @@ for arquivo_instancia in arquivos_instancias:
 
     # Adicionar novas restrições com os vetores atualizados
     modelo.addConstrs(
-        (gp.quicksum(x[j%24] for j in range(i-5, i+1)) == Q[i] for i in range(len(identificadores))), name="R"
+        (gp.quicksum(x[j%24] for j in range(i-5, i+1)) == Q[i] for i in range(len(identificadores))), name="Restrição de quantidade total de empregados"
     )
 
     modelo.addConstrs(
-        (Q[i] >= quantidades_minimas_empregados[i] for i in range(len(identificadores))), name="R"
+        (Q[i] >= quantidades_minimas_empregados[i] for i in range(len(identificadores))), name="Restrição de quantidade mínima de empregados"
     )
     
     # Imprimir os dados lidos
