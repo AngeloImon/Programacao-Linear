@@ -52,7 +52,7 @@ modelo.optimize()
 print('Solução base:')
 for i in range(len(identificadores)):
     if x[i].x > 0:
-        print(f'Horário de entrada: {horarios[i]}:00 - Quantidade Empregados: {x[i].x:2.0f} - Quantidade total empregados: {Q[i].x:.0f}')
+        print(f'Horário de entrada: {horarios[i]}:00 - Quantidade empregados entrando: {x[i].x:2.0f} - Quantidade total empregados: {Q[i].x:.0f}')
 
 print(f'Obj: {modelo.objVal}')
 
@@ -109,5 +109,5 @@ for arquivo_instancia in arquivos_instancias:
     print(f'Solução para {arquivo_instancia}:')
     for i in range(len(identificadores)):
         if x[i].x > 0:
-            print(f'Horário de entrada: {horarios[i]}:00 - Quantidade Empregados: {x[i].x:2.0f} - Quantidade total empregados: {Q[i].x:.0f}')
+            print(f'Horário de entrada: {horarios[i]}:00 - Quantidade empregados entrando: {x[i].x:2.0f} - Quantidade total empregados: {Q[i].x:.0f}')
     print(f'Obj: {modelo.objVal}')
