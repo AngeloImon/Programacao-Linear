@@ -1,3 +1,5 @@
+> 📘 This README is available in: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)
+
 # 📊 Otimização de Escalas com Gurobi
 
 Este projeto aplica um modelo de **programação linear inteira** com uso do **Gurobi** para otimizar escalas de trabalho ao longo de um período de 24 horas, visando minimizar os custos salariais e atender diferentes cenários de demanda.
